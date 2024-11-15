@@ -1,0 +1,10 @@
+'use client'
+
+function Messages() {
+  return (
+    <div>
+    </div>
+  );
+}
+
+export default Messages;
