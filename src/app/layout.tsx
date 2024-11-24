@@ -1,4 +1,7 @@
+import './global.css';
 import type { Metadata } from "next";
+import { Providers } from "./providers";
+import { Link } from '@nextui-org/react';
 
 export const metadata: Metadata = {
   title: "chat application",
@@ -13,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
