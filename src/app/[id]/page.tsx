@@ -15,13 +15,11 @@ export default function UserInfo({ params }: Params<{ id: string }>) {
       setId(id);
       await GetUserInfo(id)
         .then(res => {
-          console.log(res);
           if (typeof res != 'string') setInfo(res)
         });
     })();
   }, []);
 
-  console.log(info);
   if (!info) return (
     <div>
       <p>not found user {id}</p>

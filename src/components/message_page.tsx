@@ -32,7 +32,7 @@ export const ChatPage = ({ room_id, user_id }: { room_id: number, user_id: strin
 
   useEffect(() => {
     getMessages();
-    const interval = setInterval(() => getMessages(), 1800);
+    const interval = setInterval(() => getMessages(), 1400);
     return () => clearInterval(interval);
   }, []);
 

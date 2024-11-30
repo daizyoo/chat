@@ -1,7 +1,7 @@
 'use server'
 
 import { cookies } from "next/headers";
-import { LoginInfo, UserInfo } from "./user";
+import { GetLoginInfo, LoginInfo, UserInfo } from "./user";
 import { ApiResponse, Response } from "./api";
 
 export type Room = {
@@ -11,7 +11,7 @@ export type Room = {
 
 export type CreateRoomInfo = {
   user: LoginInfo,
-  members: [string]
+  members: string[]
 };
 
 export async function GetRooms() {
@@ -22,21 +22,20 @@ export async function GetRooms() {
   if (id && password) {
     let user: LoginInfo = { id: id, password: password };
     console.log(user);
-    let res: Response<[Room] | string> = await ApiResponse('room/get', user);
+    let res: Response<Room[] | string> = await ApiResponse('room/get', user);
     return res;
   }
 }
 
-export async function CreateRoom(members: [string]) {
-  const cookie = await cookies();
-  const id = cookie.get('user_id')?.value;
-  const password = cookie.get('password')?.value;
+export async function CreateRoom(members: string[]) {
+  const login_info = await GetLoginInfo();
 
-  if (id && password) {
-    let user: LoginInfo = { id: id, password: password };
-    let create_room: CreateRoomInfo = { user: user, members: members };
-    console.log(create_room);
-    let res: Response<string> = await ApiResponse('room/create', create_room);
-    return res;
-  }
+  if (!login_info) return undefined;
+
+  let create_room: CreateRoomInfo = { user: login_info, members: members.concat([login_info.id]) };
+
+  console.log(create_room);
+
+  let res: Response<string> = await ApiResponse('room/create', create_room);
+  return res;
 }

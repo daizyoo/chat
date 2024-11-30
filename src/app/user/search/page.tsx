@@ -1,34 +1,29 @@
 'use client'
 
-import { ApiResponse, Response } from "@/lib/api";
-import { GetLoginInfo } from "@/lib/message";
-import { GetUserId, LoginInfo, UserInfo } from "@/lib/user";
-import { CheckSpace } from "@/types/app";
+import { AddFriendResponse, SearchResponse } from "@/lib/user";
+import { LoginInfo, UserInfo } from "@/lib/user";
 import { Button, Input, Link, User } from "@nextui-org/react";
-import { MouseEvent, MouseEventHandler, useState } from "react";
+import { useState } from "react";
 
 type FriendStatus = { status: boolean };
 
-type SearchInfo = UserInfo & FriendStatus;
+export type SearchInfo = UserInfo & FriendStatus;
 
 export default function SearchUser() {
+  const [saerch_name, setSearchName] = useState('');
   const [users, setUsers] = useState<Array<SearchInfo>>([]);
 
   const Search = (name: string) => {
+    setSearchName(name);
     (async () => {
-      if (CheckSpace(name)) {
-        setUsers([]);
-        return;
-      }
-      let user_info: UserInfo = { id: name, name: name };
-      let res: Response<Array<SearchInfo>> = await ApiResponse(`user/search?id=${user_info.id}&name=${user_info.name}`, { id: await GetUserId() })
-      if (res.data) setUsers(res.data);
+      const search_info = await SearchResponse(name);
+      if (search_info) setUsers(search_info);
     })();
   };
 
   return (
     <div style={{ margin: '30px' }}>
-      <p>id or name</p>
+      <p style={{ textAlign: 'center', marginBottom: '15px' }}>id or name</p>
       <Input onChange={e => { Search(e.target.value); }} />
       <div>
         {users.map((user: SearchInfo, index) => {
@@ -40,26 +35,20 @@ export default function SearchUser() {
                   avatarProps={{ name: name }}>
                 </User>
               </Link>
-              <Button color={status ? 'default' : 'primary'} onClick={status ? undefined : async _ => {
-                let login_info = await GetLoginInfo();
-                if (login_info) {
-                  let add_friend: AddFriend = {
-                    user: login_info,
-                    friend: user,
-                  };
-                  let res = await ApiResponse('friend/add', add_friend);
-                  console.log(res);
+              {!status && <Button color='primary' onClick={async _ => {
+                if (await AddFriendResponse(user)) {
+                  Search(saerch_name);
                 }
-              }}>+</Button>
+              }}>+</Button>}
             </div>
           );
         })}
       </div>
-    </div>
+    </div >
   );
 }
 
-type AddFriend = {
+export type AddFriend = {
   user: LoginInfo,
   friend: UserInfo
 };

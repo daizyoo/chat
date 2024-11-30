@@ -3,21 +3,11 @@
 import { ApiResponse, Response } from "@/lib/api";
 import { MESSAGE_GET, MESSAGE_SEND } from "@/types/url";
 import { CheckSpace } from "@/types/app";
-import { LoginInfo, UserInfo } from "./user";
-import { cookies } from "next/headers";
+import { GetLoginInfo, LoginInfo, UserInfo } from "./user";
 
 export type Message = {
   text: string,
   user: UserInfo,
-};
-
-export const GetLoginInfo = async (): Promise<LoginInfo | undefined> => {
-  const cookie = await cookies();
-
-  const id = cookie.get('user_id');
-  const password = cookie.get('password');
-  if (id && password) return { id: id.value, password: password.value };
-  else return undefined
 };
 
 export async function GetMessageApi({ room_id }: { room_id: number }): Promise<Response<Message[] | string>> {
